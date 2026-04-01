@@ -1,6 +1,6 @@
 import { getFile, listFiles, upsertFile, deleteFile } from '@/lib/github'
 import { parseMarkdown, serializeMarkdown } from '@/lib/markdown'
-import { isAuthenticated } from '@/lib/auth'
+import { isAuthenticated, isAuthRequired } from '@/lib/auth'
 import matter from 'gray-matter'
 
 const FOLDER = 'content/posts'
@@ -27,7 +27,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  if (!await isAuthenticated()) return Response.json({ ok: false }, { status: 401 })
+  if (isAuthRequired() && !await isAuthenticated()) return Response.json({ ok: false }, { status: 401 })
   try {
     const { slug, frontmatter, content } = await req.json()
     if (!slug || !frontmatter?.title) return Response.json({ ok: false, error: 'slug et title requis' }, { status: 400 })
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  if (!await isAuthenticated()) return Response.json({ ok: false }, { status: 401 })
+  if (isAuthRequired() && !await isAuthenticated()) return Response.json({ ok: false }, { status: 401 })
   try {
     const { slug } = await req.json()
     if (!slug) return Response.json({ ok: false }, { status: 400 })

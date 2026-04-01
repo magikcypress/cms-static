@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { COOKIE_NAME, computeToken } from '@/lib/auth'
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
+  // No auth required if the repo is public
+  if (process.env.GITHUB_REPO_VISIBILITY !== 'private') return NextResponse.next()
+
   const { pathname } = req.nextUrl
 
-  // La page de login est accessible sans auth
+  // Login page is always accessible
   if (pathname === '/admin/login') return NextResponse.next()
 
   const token = req.cookies.get(COOKIE_NAME)?.value
@@ -20,6 +23,6 @@ export async function middleware(req: NextRequest) {
   return NextResponse.next()
 }
 
-export const config = {
+export const proxyConfig = {
   matcher: ['/admin/:path*'],
 }

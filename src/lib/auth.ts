@@ -2,6 +2,10 @@ import { cookies } from 'next/headers'
 
 export const COOKIE_NAME = 'cms_session'
 
+export function isAuthRequired(): boolean {
+  return process.env.GITHUB_REPO_VISIBILITY === 'private'
+}
+
 /** SHA-256 du mot de passe — fonctionne en Edge et Node.js */
 export async function computeToken(): Promise<string> {
   const password = process.env.ADMIN_PASSWORD ?? ''
