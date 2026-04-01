@@ -8,8 +8,9 @@ export async function generateStaticParams() {
   const posts = await getAllPosts()
   return posts.filter((p) => p.status === 'published').map((p) => ({ slug: p.slug }))
 }
-export default async function PostPage({ params }: { params: { slug: string } }) {
-  const post = await getPostBySlug(params.slug)
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
   if (!post || post.status !== 'published') notFound()
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">

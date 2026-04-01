@@ -1,7 +1,5 @@
 import type { NextConfig } from 'next'
 const nextConfig: NextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['gray-matter'],
-  },
+  serverExternalPackages: ['gray-matter'],
 }
 export default nextConfig
