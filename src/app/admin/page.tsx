@@ -1,6 +1,8 @@
+import type { Metadata } from 'next'
 import { getAllPosts } from '@/lib/markdown'
 import { PostList } from '@/components/PostList'
 export const revalidate = 0
+export const metadata: Metadata = { robots: { index: false, follow: false } }
 export default async function AdminPage() {
   const posts = await getAllPosts()
   const published = posts.filter((p) => p.status === 'published').length

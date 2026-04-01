@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import { getAllPosts } from '@/lib/markdown'
 import { PostList } from '@/components/PostList'
 export const revalidate = 60
+export const metadata: Metadata = {
+  title: 'Blog',
+  description: 'Tous les articles publiés.',
+  openGraph: { title: 'Blog', description: 'Tous les articles publiés.' },
+}
 export default async function HomePage() {
   const posts = await getAllPosts()
   const published = posts.filter((p) => p.status === 'published')

@@ -2,7 +2,20 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
-export const metadata: Metadata = { title: 'Mon CMS', description: 'CMS Next.js + TipTap + GitHub' }
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://cms-gws6mq9ck-magikcypress-projects.vercel.app'
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: { default: 'Mon Blog', template: '%s — Mon Blog' },
+  description: 'Articles et réflexions sur le développement web.',
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    siteName: 'Mon Blog',
+    url: SITE_URL,
+  },
+  twitter: { card: 'summary_large_image' },
+  robots: { index: true, follow: true },
+}
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
