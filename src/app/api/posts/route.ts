@@ -1,7 +1,10 @@
 import { getFile, listFiles, upsertFile, deleteFile } from '@/lib/github'
 import { parseMarkdown, serializeMarkdown } from '@/lib/markdown'
+import { isAuthenticated } from '@/lib/auth'
 import matter from 'gray-matter'
+
 const FOLDER = 'content/posts'
+const SLUG_RE = /^[a-z0-9][a-z0-9-]{0,99}$/
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
@@ -24,9 +27,11 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  if (!await isAuthenticated()) return Response.json({ ok: false }, { status: 401 })
   try {
     const { slug, frontmatter, content } = await req.json()
     if (!slug || !frontmatter?.title) return Response.json({ ok: false, error: 'slug et title requis' }, { status: 400 })
+    if (!SLUG_RE.test(slug)) return Response.json({ ok: false, error: 'slug invalide' }, { status: 400 })
     const filePath = `${FOLDER}/${slug}.md`
     const fileContent = serializeMarkdown({ slug, ...frontmatter, content })
     const existing = await getFile(filePath)
@@ -58,9 +63,11 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  if (!await isAuthenticated()) return Response.json({ ok: false }, { status: 401 })
   try {
     const { slug } = await req.json()
     if (!slug) return Response.json({ ok: false }, { status: 400 })
+    if (!SLUG_RE.test(slug)) return Response.json({ ok: false }, { status: 400 })
     const filePath = `${FOLDER}/${slug}.md`
     const existing = await getFile(filePath)
     if (!existing) return Response.json({ ok: false }, { status: 404 })

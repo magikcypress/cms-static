@@ -2,6 +2,7 @@ import matter from 'gray-matter'
 import { remark } from 'remark'
 import remarkHtml from 'remark-html'
 import remarkGfm from 'remark-gfm'
+import sanitizeHtml from 'sanitize-html'
 import slugify from 'slugify'
 import { getFile, listFiles } from './github'
 
@@ -43,7 +44,15 @@ export function serializeMarkdown(post: Omit<Post, 'contentHtml'>): string {
 
 export async function markdownToHtml(markdown: string): Promise<string> {
   const result = await remark().use(remarkGfm).use(remarkHtml, { sanitize: false }).process(markdown)
-  return result.toString()
+  return sanitizeHtml(result.toString(), {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'h1', 'h2', 'details', 'summary']),
+    allowedAttributes: {
+      ...sanitizeHtml.defaults.allowedAttributes,
+      img: ['src', 'alt', 'title', 'width', 'height'],
+      a: ['href', 'title', 'target', 'rel'],
+      '*': ['class', 'id'],
+    },
+  })
 }
 
 export function makeSlug(title: string): string {
